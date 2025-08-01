@@ -1,27 +1,54 @@
-interface ScoreBadgeProps {
-    score: number;
-}
-
-const ScoreBadge: React.FC<ScoreBadgeProps> = ({ score }) => {
-    let badgeColor = '';
-    let badgeText = '';
-
-    if (score > 70) {
-        badgeColor = 'bg-badge-green text-green-600';
-        badgeText = 'Strong';
-    } else if (score > 49) {
-        badgeColor = 'bg-badge-yellow text-yellow-600';
-        badgeText = 'Good Start';
-    } else {
-        badgeColor = 'bg-badge-red text-red-600';
-        badgeText = 'Needs Work';
-    }
+const ScoreCircle = ({ score = 75 }: { score: number }) => {
+    const radius = 40;
+    const stroke = 8;
+    const normalizedRadius = radius - stroke / 2;
+    const circumference = 2 * Math.PI * normalizedRadius;
+    const progress = score / 100;
+    const strokeDashoffset = circumference * (1 - progress);
 
     return (
-        <div className={`px-3 py-1 rounded-full ${badgeColor}`}>
-            <p className="text-sm font-medium">{badgeText}</p>
+        <div className="relative w-[100px] h-[100px]">
+            <svg
+                height="100%"
+                width="100%"
+                viewBox="0 0 100 100"
+                className="transform -rotate-90"
+            >
+                {/* Background circle */}
+                <circle
+                    cx="50"
+                    cy="50"
+                    r={normalizedRadius}
+                    stroke="#e5e7eb"
+                    strokeWidth={stroke}
+                    fill="transparent"
+                />
+                {/* Partial circle with gradient */}
+                <defs>
+                    <linearGradient id="grad" x1="1" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#FF97AD" />
+                        <stop offset="100%" stopColor="#5171FF" />
+                    </linearGradient>
+                </defs>
+                <circle
+                    cx="50"
+                    cy="50"
+                    r={normalizedRadius}
+                    stroke="url(#grad)"
+                    strokeWidth={stroke}
+                    fill="transparent"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                />
+            </svg>
+
+            {/* Score and issues */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-semibold text-sm">{`${score}/100`}</span>
+            </div>
         </div>
     );
 };
 
-export default ScoreBadge;
+export default ScoreCircle;
